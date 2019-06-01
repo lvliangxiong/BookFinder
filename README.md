@@ -18,3 +18,5 @@ Refer to [here](https://lvliangxiong.github.io/2019/06/01/BookFinder-A-e-book-se
 4. Find the *.cer* certificate file, install it for all users and in the root directory.
 5. Click the *.msixbundle* file to install the App.
 6. If the 5th step won't work, try install through run the powershell script file ended with *.ps1*.
+
+A Chinese install tutorial in detail can be found [here](https://blog.csdn.net/qq_32950653/article/details/82194174).  
