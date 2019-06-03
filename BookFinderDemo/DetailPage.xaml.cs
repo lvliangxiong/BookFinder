@@ -15,6 +15,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
+using Windows.UI.Core;
 using Windows.UI.Notifications;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
@@ -94,14 +95,13 @@ namespace BookFinderDemo
             switch (b.Name)
             {
                 case "SaveButton":
-
-                    StorageFile file = await DownloadBookAsync(book);
-                    await ShowDownloadToastAsync(file);
+                    bool isComplete = await BOkCrawler.DownloadBookAsync(book);
+                    ShowDownloadToastAsync(isComplete);
                     break;
 
                 case "ShareButton":
-                    //StorageFile f = await DownloadsFolder.CreateFileAsync("demo.epub", CreationCollisionOption.GenerateUniqueName);
-                    //await ShowDownloadToastAsync(f);
+                    
+                    ;
                     break;
 
                 default:
@@ -109,8 +109,13 @@ namespace BookFinderDemo
             }
         }
 
-        private async Task ShowDownloadToastAsync(StorageFile file)
+        private async void ShowDownloadToastAsync(bool isComplete)
         {
+            if(!isComplete)
+            {
+                return;
+            }
+
             string title = "Book Downloaded Successfully!";
             string image = book.coverLink.ToString();
 
@@ -144,7 +149,7 @@ namespace BookFinderDemo
                     new ToastButton("View", new QueryString()
                     {
                         { "action", "viewBook" },
-                        { "filepath", Path.GetDirectoryName(file.Path) }
+                        { "filepath", BookView.DownloadPathString }
 
                     }.ToString())
                     {
@@ -192,14 +197,6 @@ namespace BookFinderDemo
 
             // And register the task
             BackgroundTaskRegistration registration = builder.Register();
-
-
-        }
-
-        private async Task<StorageFile> DownloadBookAsync(Book book)
-        {
-            StorageFile file = await BOkCrawler.DownloadBookAsync(book);
-            return file;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -26,34 +27,18 @@ namespace BookFinderDemo
         public HomePage()
         {
             this.InitializeComponent();
-            this.ViewModel = new BookViewModel();
+            this.ViewModel = new BookView();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
         }
 
 
-        public BookViewModel ViewModel { get; set; }
+        public BookView ViewModel { get; set; }
 
 
         private void PopularBookCollections_ItemClick(object sender, ItemClickEventArgs e)
         {
             this.Frame.Navigate(typeof(DetailPage), e.ClickedItem);
         }
-    }
-
-    public class BookViewModel
-    {
-        private ObservableCollection<Book> popularBooks = new ObservableCollection<Book>();
-        public ObservableCollection<Book> PopularBooks { get { return this.popularBooks; } }
-
-        //constructor
-        public BookViewModel()
-        {
-            //Attention here, the private field was bound together, Changes will impact both of them.
-            BOkCrawler.GetPopularBooks();
-            this.popularBooks = BOkCrawler.PopularBooks;
-
-        }
-
     }
 
 }

@@ -147,7 +147,7 @@ namespace BookFinderDemo
         }
 
 
-        public static async Task GetPopularBooksCoverAsync()
+        public static async void GetPopularBooksCoverAsync()
         {
             try
             {
@@ -291,19 +291,19 @@ namespace BookFinderDemo
 
         }
 
-        public static async void GetPopularBooks()
+        public static void GetPopularBooks()
         {
-            await GetPopularBooksCoverAsync();
+            GetPopularBooksCoverAsync();
             //GetPopularBooksDetailsAsync();
         }
 
-        public static async Task<StorageFile> DownloadBookAsync(Book book)
+        public static async Task<bool> DownloadBookAsync(Book book)
         {
             if (book.detailPageLink == null)
             {
                 MessageDialog m = new MessageDialog("Couldn't fetch the book info about its detail page!");
                 await m.ShowAsync();
-                return null;
+                return false;
             }
 
             if (book.downloadLink == null)
@@ -363,13 +363,21 @@ namespace BookFinderDemo
 
                     string fileName = Regex.Matches(contentDisposition, pattern).First().Groups[1].ToString();
 
+                    StorageFile destinationFile;
 
-                    StorageFile destinationFile = await DownloadsFolder.CreateFileAsync(GetSafeFilename(fileName), CreationCollisionOption.GenerateUniqueName);
+                    if (BookView.DownloadPath == null)
+                    {
+                        destinationFile = await DownloadsFolder.CreateFileAsync(GetSafeFilename(fileName), CreationCollisionOption.GenerateUniqueName);
+                        BookView.DownloadPathString = Path.GetDirectoryName(destinationFile.Path);
+                    }
+                    else
+                    {
+                        destinationFile = await BookView.DownloadPath.CreateFileAsync(GetSafeFilename(fileName), CreationCollisionOption.GenerateUniqueName);
+                    }
 
                     Stream s = response.GetResponseStream();
-                    await FileIO.WriteBytesAsync(destinationFile, ReadStream(s));
-
-                    return destinationFile;
+                    await Task.Run(()=> FileIO.WriteBytesAsync(destinationFile, ReadStream(s)));
+                    return true;
 
                 }
                 catch (WebException)
@@ -378,7 +386,7 @@ namespace BookFinderDemo
                     await m.ShowAsync();
                 }
             }
-            return null;
+            return false;
         }
 
         private static byte[] ReadStream(Stream stream)
@@ -457,4 +465,27 @@ namespace BookFinderDemo
         }
 
     }
+
+    public class BookView
+    {
+        private ObservableCollection<Book> popularBooks = new ObservableCollection<Book>();
+        public ObservableCollection<Book> PopularBooks { get { return this.popularBooks; } }
+
+        private static StorageFolder downloadPath;
+        public static StorageFolder DownloadPath { get => downloadPath; }
+        private static string downloadPathString;
+
+        public static string DownloadPathString { get => (downloadPath == null) ? downloadPathString : downloadPath.Path; set => downloadPathString = value;  }
+
+
+        //constructor
+        public BookView()
+        {
+            //Attention here, the private field was bound together, Changes will impact both of them.
+            BOkCrawler.GetPopularBooks();
+            this.popularBooks = BOkCrawler.PopularBooks;
+        }
+
+    }
+
 }
