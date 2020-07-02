@@ -8,7 +8,7 @@ The primary function of the App was to scrawling specific e-book sharing website
 
 ## Intro url: 
 
-Refer to [here](https://lvliangxiong.github.io/2019/06/01/BookFinder-A-e-book-search-app-UWP/).
+Refer to [here](https://lvliangxiong.github.io/post/c-family/uwp-application-for-searching-ebooks/).
 
 ## Install
 
